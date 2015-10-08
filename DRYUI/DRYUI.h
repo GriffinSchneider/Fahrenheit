@@ -138,7 +138,7 @@ _dryui_add_subview_helper_2(variableName, styleOrView, metamacro_foreach_cxt(_dr
 // empty style if it isn't.
 #define _dryui_add_subview_helper_2(variableName, styleOrView, codeAfterVariableAssignment) \
 _dryui_add_subview_helper_1(variableName, \
-  \
+    /* Save styleOrView to a variable, since it might be an expression like '[UIView new' that we should only evaluate once */ \
     typeof(styleOrView) _DRYUI_SAVED_STYLE_OR_VIEW = styleOrView; \
     _DRYUI_PASSED_INSTANCE_OR_NIL = _dryui_returnGivenViewOrNil(_DRYUI_SAVED_STYLE_OR_VIEW); \
 , \
@@ -208,7 +208,7 @@ static inline id __attribute((overloadable, unused)) _dryui_returnGivenStyleOrNi
 //    firstArg, secondArg
 #define _DRYUI_EXTRACT_VARIABLE_NAME(idx, something) metamacro_if_eq(metamacro_is_even(idx), 1)()(something)
 #define _DRYUI_EXTRACT_VARIABLE_NAMES(...) \
-metamacro_if_eq(1, metamacro_argcount( bogus , ##__VA_ARGS__ ))()(dryui_metamacro_foreach_even_comma(_DRYUI_EXTRACT_VARIABLE_NAME , ##__VA_ARGS__ ))
+metamacro_if_eq(1, metamacro_argcount(bogus , ##__VA_ARGS__ )) () (dryui_metamacro_foreach_even_comma(_DRYUI_EXTRACT_VARIABLE_NAME , ##__VA_ARGS__ ))
 
 // Passed an argument list like this:
 //    NSString *, firstArg, NSString *, secondArg
@@ -216,7 +216,7 @@ metamacro_if_eq(1, metamacro_argcount( bogus , ##__VA_ARGS__ ))()(dryui_metamacr
 //    NSString *firstArg, NSString *secondArg
 #define _DRYUI_NOTHING(idx, x) x
 #define _DRYUI_EXTRACT_ARGUMENTS(...) \
-metamacro_if_eq(1, metamacro_argcount( bogus , ##__VA_ARGS__ ))()(dryui_metamacro_foreach_even_comma(_DRYUI_NOTHING , ##__VA_ARGS__ ))
+metamacro_if_eq(1, metamacro_argcount(bogus , ##__VA_ARGS__ )) () (dryui_metamacro_foreach_even_comma(_DRYUI_NOTHING , ##__VA_ARGS__ ))
 
 // Expands to a comma (,) if there are any arguments. Otherwise, expands to nothing.
 #define _DRYUI_COMMA_IF_ANY_ARGS(...) metamacro_if_eq(1, metamacro_argcount(bogus , ##__VA_ARGS__))()(,)
@@ -240,11 +240,7 @@ metamacro_if_eq(1, metamacro_argcount(args)) ( \
 \
 typedef void (^_DRYUI_applicationBlockForStyle_##styleName)(id _, _DRYUI_VIEW *superview, id self _DRYUI_COMMA_IF_ANY_ARGS( __VA_ARGS__ ) _DRYUI_EXTRACT_ARGUMENTS( __VA_ARGS__ )); \
 FOUNDATION_EXTERN _DRYUI_applicationBlockForStyle_##styleName _DRYUI_STYLE_APPLICATION_BLOCK_VARIABLE_NAME(styleName); \
-_DRYUI_TYPEDEFS(styleName, className , ##__VA_ARGS__ ) \
-
-
-
-#define _DRYUI_TYPEDEFS(styleName, className, ...) \
+\
 metamacro_if_eq(1, metamacro_argcount(bogus , ##__VA_ARGS__ )) ( \
     _DRYUI_TYPEDEFS_NO_ARGS(styleName, className) \
 ) ( \
@@ -252,7 +248,6 @@ metamacro_if_eq(1, metamacro_argcount(bogus , ##__VA_ARGS__ )) ( \
 )
 
 #define _DRYUI_TYPEDEFS_NO_ARGS(styleName, className) \
-\
 typedef void (^_DRYUI_blockThatGetsPassedByAddStyleToView_##styleName )(); \
 typedef void                                            (^_DRYUI_blockReturnedByBlockForStyle_##styleName)( _DRYUI_STYLE_CLASS_NAME(styleName)*, _DRYUI_blockThatGetsPassedByAddStyleToView_##styleName blockFromAddStyleToView); \
 typedef _DRYUI_blockReturnedByBlockForStyle_##styleName (^_DRYUI_blockForStyle_##styleName)(_DRYUI_STYLE_CLASS_NAME(styleName)*); \
@@ -288,7 +283,6 @@ static inline void __attribute__((overloadable, unused)) _dryui_addStyleToView_a
 
 
 #define _DRYUI_TYPEDEFS_SOME_ARGS(styleName, className, ...) \
-\
 typedef void (^_DRYUI_blockThatGetsPassedByAddStyleToView_##styleName )(_DRYUI_EXTRACT_ARGUMENTS( __VA_ARGS__)); \
 typedef void                                                           (^_DRYUI_blockReturnedByBlockReturnedByBlockForStyle_##styleName)( _DRYUI_STYLE_CLASS_NAME(styleName)*, _DRYUI_blockThatGetsPassedByAddStyleToView_##styleName blockFromAddStyleToView); \
 typedef _DRYUI_blockReturnedByBlockReturnedByBlockForStyle_##styleName (^_DRYUI_blockReturnedByBlockForStyle_##styleName)(_DRYUI_STYLE_CLASS_NAME(styleName)*); \
@@ -351,18 +345,18 @@ static inline void __attribute__((overloadable, unused)) _dryui_addStyleToView_a
 
 #define _dryui_style(args...) \
 metamacro_if_eq(1, metamacro_argcount(args)) ( \
-    dryui_style1(args) \
+    _dryui_style1(args) \
 ) ( \
     metamacro_if_eq(2, metamacro_argcount(args)) ( \
-        dryui_style2(args) \
+        _dryui_style2(args) \
     ) ( \
-        dryui_styleMore(args) \
+        _dryui_styleMore(args) \
     ) \
 )
 
-#define dryui_style1(styleName) dryui_style2(styleName, _DRYUI_VIEW)
-#define dryui_style2(styleName, className) dryui_styleMore(styleName, className)
-#define dryui_styleMore(styleName, className, ...) \
+#define _dryui_style1(styleName) _dryui_style2(styleName, _DRYUI_VIEW)
+#define _dryui_style2(styleName, className) _dryui_styleMore(styleName, className)
+#define _dryui_styleMore(styleName, className, ...) \
 @implementation _DRYUI_STYLE_CLASS_NAME(styleName) \
 @end \
 \
