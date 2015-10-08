@@ -11,12 +11,10 @@
 #import <DRYUI/DRYUI.h>
 
 #define BIG_STYLE_LIST \
-Style0, Style1, Style2, Style3, Style3, Style3, \
-Style3, Style3, Style3, Style3, Style3, Style3, \
-Style3, Style3, Style3, Style3, Style3, Style3, \
-Style3, Style3, Style3, Style3, Style3, Style3, \
-Style3, Style3, Style3, Style3, Style3, Style3, \
-Style3 \
+Style0, Style1, Style2, Style3, Style3, \
+Style3, Style3, Style3, Style3, Style3, \
+Style3, Style3, Style3, Style3, Style3, \
+Style3, Style3, Style3, Style3
 
 @interface DRYUITests : XCTestCase
 
