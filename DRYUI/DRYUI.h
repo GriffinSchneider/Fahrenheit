@@ -176,23 +176,23 @@ static inline id __attribute((overloadable, unused)) _dryui_returnGivenStyleOrNi
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - Public Style Macros
+#pragma mark - Style Macros
+
+#define dryui_style(args...) _dryui_style(args)
+
+#define dryui_public_style(args...) _dryui_public_style(args)
+#define dryui_private_style(args...) _dryui_private_style(args)
 
 #define dryui_applyStyle(view, style, selfForStyle) _dryui_addStyleToView(view, style(nil), selfForStyle)
 #define dryui_parentStyle(style) _dryui_addStyleToView_internal(_, style(nil), self)
 
-// Private styles are just the public style declaration and then the style implementation
-#define dryui_private_style(...) \
-dryui_public_style(__VA_ARGS__) \
-dryui_style(__VA_ARGS__)
-
-#define dryui_public_style(args...) _dryui_public_style(args)
-#define dryui_style(args...) _dryui_style(args)
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - Public Style Macro Implementation
+#pragma mark - Style Macro Implementation
+
+// Private styles are just the public style declaration and then the style implementation
+#define _dryui_private_style(args...) dryui_public_style(args) dryui_style(args)
 
 // Helper macros that generate static variable names that store all the actual style data
 #define _DRYUI_STYLE_CLASS_NAME(styleName) metamacro_concat(_DRYUI_Style_, styleName)
