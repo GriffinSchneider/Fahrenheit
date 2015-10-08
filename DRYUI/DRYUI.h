@@ -45,8 +45,6 @@ typedef void (^DRYUIViewAndSuperviewBlock)(id _, _DRYUI_VIEW *superview);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 @interface DRYUIStyle : NSObject
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSString *viewClassName;
 @end
 
 
@@ -69,20 +67,15 @@ FOUNDATION_EXTERN void _dryui_addViewFromBuildSubviews(_DRYUI_VIEW *view, _DRYUI
 #pragma mark -
 #pragma mark Hierarchy Building Macros
 
-#define build_subviews(args...) DRYUI_TOPLEVEL(args)
-
-#define _DRYUI_CONCATENATE_DETAIL(x, y) x##y
-#define _DRYUI_CONCATENATE(x, y) _DRYUI_CONCATENATE_DETAIL(x, y)
+#define build_subviews(args...) _build_subviews(args)
 
 // Define some macros that will generate 'unique' variable names using __LINE__.
 // The names will be unique as long as the DRYUI macros aren't used twice on the same line.
-#define _DRYUI_PASSED_INSTANCE_OR_NIL _DRYUI_CONCATENATE(_dryui_passedInstanceOrNil, __LINE__)
-#define _DRYUI_VIEW_AND_SUPERVIEW_BLOCK _DRYUI_CONCATENATE(_dryui_viewAndSuperviewBlockk, __LINE__)
-#define _DRYUI_GOTO_LABEL _DRYUI_CONCATENATE(_dryui_gotoLabel, __LINE__)
-#define _DRYUI_PREVIOUS_TOPLEVEL_VIEW _DRYUI_CONCATENATE(_dryui_previousTopLevelView, __LINE__)
-#define _DRYUI_SAVED_STYLE_OR_VIEW _DRYUI_CONCATENATE(_dryui_savedStyleOrView, __LINE__)
-
-#define _DRYUI_VIEW_TYPE(viewArg) typeof([viewArg _dryui_selfOrInstanceOfSelf])
+#define _DRYUI_PASSED_INSTANCE_OR_NIL metamacro_concat(_dryui_passedInstanceOrNil, __LINE__)
+#define _DRYUI_VIEW_AND_SUPERVIEW_BLOCK metamacro_concat(_dryui_viewAndSuperviewBlockk, __LINE__)
+#define _DRYUI_GOTO_LABEL metamacro_concat(_dryui_gotoLabel, __LINE__)
+#define _DRYUI_PREVIOUS_TOPLEVEL_VIEW metamacro_concat(_dryui_previousTopLevelView, __LINE__)
+#define _DRYUI_SAVED_STYLE_OR_VIEW metamacro_concat(_dryui_savedStyleOrView, __LINE__)
 
 // body_after_statement_after_macro will get run *after* the statement formed by the end of this macro and whatever
 // the user puts after the macro within {}.
@@ -101,11 +94,11 @@ if (1) { \
             _DRYUI_VIEW_AND_SUPERVIEW_BLOCK = nil; \
             break; \
         } else \
-            _DRYUI_GOTO_LABEL: _DRYUI_VIEW_AND_SUPERVIEW_BLOCK = ^(_DRYUI_VIEW_TYPE(viewArg) _, _DRYUI_VIEW *superview) \
+            _DRYUI_GOTO_LABEL: _DRYUI_VIEW_AND_SUPERVIEW_BLOCK = ^(typeof([viewArg _dryui_selfOrInstanceOfSelf]) _, _DRYUI_VIEW *superview) \
             // We couldn't get execution here without GOTOing here, but once we do and this statement finishes,
             // execution will jump back up to the while(1) and then into body_after_statement_after_macro.
 
-#define DRYUI_TOPLEVEL(viewArg) \
+#define _build_subviews(viewArg) \
 _DRYUI_VIEW *_DRYUI_PREVIOUS_TOPLEVEL_VIEW = _dryui_current_toplevel_view; \
 _dryui_current_toplevel_view = [viewArg _dryui_selfOrInstanceOfSelf]; \
 _DRYUI_GOTO_HELPER(viewArg, \
@@ -371,8 +364,6 @@ metamacro_if_eq(1, metamacro_argcount(args)) ( \
 #define dryui_style2(styleName, className) dryui_styleMore(styleName, className)
 #define dryui_styleMore(styleName, className, ...) \
 @implementation _DRYUI_STYLE_CLASS_NAME(styleName) \
-- (NSString *)name {return @ # styleName;} \
-- (NSString *)viewClassName {return @ # className;} \
 @end \
 \
 dryui_splitoutthing(styleName, className , ##__VA_ARGS__ ); \
