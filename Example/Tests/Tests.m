@@ -57,7 +57,7 @@ dryui_private_style(StyleButton, UIButton) {
     dryui_parentStyle(Style3);
 };
 
-dryui_private_style(StyleWithArgs, UILabel, NSString *, firstArg, NSInteger, secondArg) {
+dryui_private_style(StyleWithArgs, UILabel, (NSString *)firstArg, (NSInteger)secondArg) {
     _.text = firstArg;
     _.tag = secondArg;
 };
@@ -66,7 +66,7 @@ dryui_private_style(ChildOfArgsWithoutArgs, UILabel) {
     dryui_parentStyle(StyleWithArgs(@"coming from child", 11));
 };
 
-dryui_private_style(ChildOfArgsWithArgs, UILabel, NSString *, firstArg) {
+dryui_private_style(ChildOfArgsWithArgs, UILabel, (NSString *)firstArg) {
     dryui_parentStyle(StyleWithArgs(firstArg, 22));
 };
 
